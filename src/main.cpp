@@ -70,7 +70,7 @@ void updateTime()
 {
     elapsedTime = (millis() - startTime) / 1000;
     numbers[3] = elapsedTime % 10;
-    numbers[2] = elapsedTime / 10;
+    numbers[2] = (elapsedTime % 60) / 10;
     numbers[1] = (elapsedTime / 60) % 10;
     numbers[0] = (elapsedTime / 60) / 10;
 }
