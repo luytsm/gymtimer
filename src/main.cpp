@@ -1,6 +1,6 @@
 #include "Arduino.h"
 
-int numeral[10]= { 
+int numeral[10]= {
 B11111100, //0
 B01100000, //1
 B11011010, //2
@@ -13,14 +13,14 @@ B11111110, //8
 B11100110, //9
 };
 
-const int segmentPins[8] = {8, 7, A2, 6, 5, 4, A1, A0};
+const int segmentPins[8] = {8, 7, A2, 6, 5, 4, A1, A0}; //reverezed the pins
 const int digitCount = 4;
 const int digitPins[digitCount] = {A3, A4, A5, 9};
 const int startStopPin = 2;
 const int resetPin = 3;
 
 long startTime, elapsedTime;
-int numbers[digitCount] = {0, 1, 2, 3}; 
+int numbers[digitCount] = {0, 0, 0, 0}; 
 boolean running;
 
 void showDigit (int number, int digit)
@@ -78,7 +78,10 @@ void updateTime()
 void printTime()
 {
     for (int i = 0; i < digitCount; i ++)
+    {
         showDigit(numbers[i], i);
+        if (digitCount == 2) setMiddleDP;
+    }
 }
 
 void run()
