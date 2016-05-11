@@ -19,8 +19,10 @@ const int digitPins[digitCount] = {A3, A4, A5, 9};
 const int startStopPin = 2;
 const int resetPin = 3;
 
-long startTime, elapsedTime;
-int numbers[digitCount] = {0, 0, 0, 0}; 
+
+long startTime, timeStopped;
+long elapsedTime = 132000;
+int displayedDigits[digitCount] = {0, 0, 0, 0}; 
 boolean running;
 
 void showDigit (int number, int digit)
@@ -32,7 +34,7 @@ void showDigit (int number, int digit)
         digitalWrite(segmentPins[segment], isBitSet);
     }
     digitalWrite(digitPins[digit], LOW);
-    delay(3);
+    delay(5);
     digitalWrite(digitPins[digit], HIGH);
 }
 
@@ -53,7 +55,6 @@ void startStop()
     else
     {
         running = true;
-        startTime = 0;
     }
 }
 
@@ -63,34 +64,56 @@ void reset()
     if (!running) 
     {
         elapsedTime = 0; 
+        startTime = millis();
     }
 }
 
-void updateTime()
+void calculateTimeDiff()
 {
-    elapsedTime = (millis() - startTime) / 1000;
-    numbers[3] = elapsedTime % 10;
-    numbers[2] = (elapsedTime % 60) / 10;
-    numbers[1] = (elapsedTime / 60) % 10;
-    numbers[0] = (elapsedTime / 60) / 10;
+    elapsedTime = millis() - elapsedTime + timeStopped;
+}
+
+void updateDisplayedDigits()
+{
+    elapsedTime = elapsedTime / 1000;
+    displayedDigits[3] = (elapsedTime % 60) % 10;
+    displayedDigits[2] = (elapsedTime % 60) / 10;
+    displayedDigits[1] = (elapsedTime / 60) % 10;
+    displayedDigits[0] = (elapsedTime / 60) / 10;
 }
 
 void printTime()
 {
     for (int i = 0; i < digitCount; i ++)
     {
-        showDigit(numbers[i], i);
-        if (digitCount == 2) setMiddleDP;
+        showDigit(displayedDigits[i], i);
+        //if (digitCount == 2) setMiddleDP();
     }
+}
+void debugTime()
+{
+    Serial.print("De tijd is nu: ");
+    Serial.print(displayedDigits[0]);
+    Serial.print(displayedDigits[1]);
+    Serial.print(":");
+    Serial.print(displayedDigits[2]);
+    Serial.println(displayedDigits[3]);
+
 }
 
 void run()
 {
+    calculateTimeDiff();
     if (running)
     {
-        updateTime();
+        updateDisplayedDigits();
+    }
+    else 
+    {
+        timeStopped = millis() - elapsedTime + timeStopped; 
     }
     printTime();
+    debugTime();
     
 }
 
@@ -107,7 +130,7 @@ void setup()
     pinMode(resetPin, INPUT);
     attachInterrupt(digitalPinToInterrupt(startStopPin), startStop, FALLING);
     attachInterrupt(digitalPinToInterrupt(resetPin), reset, FALLING);
-    running = false;
+    running = true;
 }
 
 void loop()
